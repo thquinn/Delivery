@@ -32,10 +32,10 @@ namespace Assets.Code {
         }
 
         public static Quaternion GetMinRotationMod90(Quaternion q, float targetAngle) {
-            // TODO: This is breaking on 90 CCW rotation.
             Vector3 euler = q.eulerAngles;
             for (int i = 0; i < 4; i++) {
-                if (Mathf.DeltaAngle(euler.z, targetAngle) < 45) {
+                float delta = Mathf.Abs(Mathf.DeltaAngle(euler.z, targetAngle));
+                if (delta < 45) {
                     return Quaternion.Euler(euler);
                 }
                 euler.z += 90;
