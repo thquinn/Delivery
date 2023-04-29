@@ -20,7 +20,7 @@ public class OminoScript : MonoBehaviour
         colliderToCoor = new Dictionary<Collider2D, Vector2Int>();
         coorToScript = new Dictionary<Vector2Int, BlockScript>();
         combineColliderToCoorAndDirection = new Dictionary<Collider2D, (Vector2Int, Vector2Int)>();
-        Init(new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(0, 1), new Vector2Int(1, 1) });
+        Init(new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(0, 1) });
     }
     public void Init(IEnumerable<Vector2Int> coors) {
         foreach (Vector2Int coor in coors) {
@@ -49,7 +49,9 @@ public class OminoScript : MonoBehaviour
 
     public void Combine(Collider2D thisCollider, Collider2D otherCollider) {
         OminoScript otherOmino = otherCollider.transform.parent.parent.GetComponent<OminoScript>();
-        Debug.Assert(otherOmino != this);
+        if (otherOmino == this) {
+            return;
+        }
         var (coorOne, directionOne) = combineColliderToCoorAndDirection[thisCollider];
         var (coorTwo, directionTwo) = otherOmino.combineColliderToCoorAndDirection[otherCollider];
         Vector2Int combineOrigin = coorOne + directionOne;
