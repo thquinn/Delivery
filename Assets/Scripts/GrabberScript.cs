@@ -33,7 +33,7 @@ public class GrabberScript : MonoBehaviour
             fixedJoint.enabled = closestRB != null;
             fixedJoint.connectedBody = closestRB;
             grabbedOmino = closestRB?.GetComponent<OminoScript>();
-        } else if (!grabbing) {
+        } else if (!grabbing || grabbedOmino == null) {
             fixedJoint.enabled = false;
             fixedJoint.connectedBody = null;
             if (grabbedOmino != null) {
@@ -45,6 +45,9 @@ public class GrabberScript : MonoBehaviour
             grabbedOmino.combineEnabled = IsCombineEnabled();
         }
         if (IsEviscerating()) {
+            if (evisceratingBlock != null) {
+                evisceratingBlock.beingEviscerated = false;
+            }
             Rigidbody2D closestRB = Util.GetClosest(transform.position, .1f, layerMaskEviscerate);
             evisceratingBlock = closestRB?.transform.parent.GetComponent<BlockScript>();
             if (evisceratingBlock != null) {

@@ -24,8 +24,8 @@ public class BlockScript : MonoBehaviour
     void Update() {
         // Combine lerping.
         if (combineLerping) {
-            spritesTransform.localPosition = Vector3.SmoothDamp(spritesTransform.localPosition, Vector3.zero, ref lerpV, .1f);
-            spritesTransform.localRotation = Util.SmoothDampQuaternion(spritesTransform.localRotation, Quaternion.identity, ref lerpAV, .1f);
+            spritesTransform.localPosition = Vector3.SmoothDamp(spritesTransform.localPosition, Vector3.zero, ref lerpV, .05f);
+            spritesTransform.localRotation = Util.SmoothDampQuaternion(spritesTransform.localRotation, Quaternion.identity, ref lerpAV, .05f);
             if (spritesTransform.localPosition.sqrMagnitude < .1f) {
                 spritesTransform.localPosition = Vector3.zero;
                 spritesTransform.localRotation = Quaternion.identity;

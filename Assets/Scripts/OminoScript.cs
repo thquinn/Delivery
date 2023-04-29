@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class OminoScript : MonoBehaviour
 {
-    static float INTERBLOCK_DISTANCE = 4.25f;
+    public static float INTERBLOCK_DISTANCE = 4.25f;
     public static Vector2Int[] NEIGHBOR_ORDER = new Vector2Int[] { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
 
     public GameObject prefabBlock;
@@ -47,7 +47,6 @@ public class OminoScript : MonoBehaviour
     }
     void FinalizeOmino() {
         ID = Util.GetCanonicalPolyominoID(coorToScript.Keys);
-        Debug.Log("Assigned ID: " + ID);
         foreach (var kvp in coorToScript) {
             for (int i = 0; i < NEIGHBOR_ORDER.Length; i++) {
                 kvp.Value.combineColliders[i].gameObject.SetActive(!coorToScript.ContainsKey(kvp.Key + NEIGHBOR_ORDER[i]));
@@ -133,5 +132,9 @@ public class OminoScript : MonoBehaviour
             }
         }
         return seen;
+    }
+
+    public bool ContainsAll(Dictionary<Collider2D, OminoScript> colliders) {
+        return colliderToCoor.Keys.All(c => colliders.ContainsKey(c));
     }
 }

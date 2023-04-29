@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2577552088929716899}
   - component: {fileID: 2577552088929716897}
   - component: {fileID: 2577552088929716896}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Omino
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,9 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53fb673f1bbb1b949a4f5b8def29dbc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefabOmino: {fileID: 2577552088929716903}
   prefabBlock: {fileID: 6604296448550994255, guid: 733057349b8ac754e967fe4eb57dbfb0, type: 3}
-  debugCoors: []
+  ID: 0
   combineEnabled: 0
 --- !u!50 &2577552088929716897
 Rigidbody2D:
