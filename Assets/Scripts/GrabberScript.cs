@@ -11,11 +11,12 @@ public class GrabberScript : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public Rigidbody2D rb2d;
     public FixedJoint2D fixedJoint;
-    public LayerMask layerMaskBlock;
+    public LayerMask layerMaskBlock, layerMaskEviscerate;
 
     float lastAngle;
     bool lastGrabbing;
     OminoScript grabbedOmino;
+    BlockScript evisceratingBlock;
 
     void FixedUpdate() {
         float angle = GetAngle();
@@ -28,15 +29,7 @@ public class GrabberScript : MonoBehaviour
         }
         bool grabbing = IsGrabbing();
         if (!lastGrabbing && grabbing) {
-            Rigidbody2D closestRB = null;
-            float closestDistance = float.MaxValue;
-            foreach (Collider2D c in Physics2D.OverlapCircleAll(transform.position, 1.1f, layerMaskBlock)) {
-                float distance = Vector2.Distance(c.transform.position, transform.position);
-                if (distance < closestDistance) {
-                    closestRB = c.attachedRigidbody;
-                    closestDistance = distance;
-                }
-            }
+            Rigidbody2D closestRB = Util.GetClosest(transform.position, 1.1f, layerMaskBlock);
             fixedJoint.enabled = closestRB != null;
             fixedJoint.connectedBody = closestRB;
             grabbedOmino = closestRB?.GetComponent<OminoScript>();
@@ -50,6 +43,16 @@ public class GrabberScript : MonoBehaviour
         }
         if (grabbedOmino != null) {
             grabbedOmino.combineEnabled = IsCombineEnabled();
+        }
+        if (IsEviscerating()) {
+            Rigidbody2D closestRB = Util.GetClosest(transform.position, .1f, layerMaskEviscerate);
+            evisceratingBlock = closestRB?.transform.parent.GetComponent<BlockScript>();
+            if (evisceratingBlock != null) {
+                evisceratingBlock.beingEviscerated = true;
+            }
+        } else if (evisceratingBlock != null) {
+            evisceratingBlock.beingEviscerated = false;
+            evisceratingBlock = null;
         }
         lastAngle = angle;
         lastGrabbing = grabbing;
@@ -65,6 +68,9 @@ public class GrabberScript : MonoBehaviour
         return Input.GetMouseButton(0);
     }
     bool IsCombineEnabled() {
-        return Input.GetMouseButton(1);
+        return IsGrabbing() && Input.GetMouseButton(1);
+    }
+    bool IsEviscerating() {
+        return !IsGrabbing() && Input.GetMouseButton(1);
     }
 }

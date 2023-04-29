@@ -21,6 +21,19 @@ namespace Assets.Code {
             return 3;
         }
 
+        public static Rigidbody2D GetClosest(Vector2 position, float radius, LayerMask layerMask) {
+            Rigidbody2D closestRB = null;
+            float closestDistance = float.MaxValue;
+            foreach (Collider2D c in Physics2D.OverlapCircleAll(position, radius, layerMask)) {
+                float distance = Vector2.Distance(c.transform.position, position);
+                if (distance < closestDistance) {
+                    closestRB = c.attachedRigidbody;
+                    closestDistance = distance;
+                }
+            }
+            return closestRB;
+        }
+
         public static Vector3 GetMouseWorldPosition() {
             if (cam == null) cam = Camera.main;
             Vector3 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);

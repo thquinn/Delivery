@@ -46,7 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53fb673f1bbb1b949a4f5b8def29dbc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabOmino: {fileID: 2577552088929716903}
   prefabBlock: {fileID: 6604296448550994255, guid: 733057349b8ac754e967fe4eb57dbfb0, type: 3}
+  debugCoors: []
+  combineEnabled: 0
 --- !u!50 &2577552088929716897
 Rigidbody2D:
   serializedVersion: 4

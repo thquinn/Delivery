@@ -1,6 +1,7 @@
 using Assets.Code;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class OminoScript : MonoBehaviour
@@ -16,17 +17,16 @@ public class OminoScript : MonoBehaviour
     protected Dictionary<Vector2Int, BlockScript> coorToScript;
     protected Dictionary<Collider2D, (Vector2Int, Vector2Int)> combineColliderToCoorAndDirection;
 
-    void Start() {
+    public void Init(IEnumerable<Vector2Int> coors) {
+        Debug.Log($"Initting with {coors.Count()} coors.");
         colliderToCoor = new Dictionary<Collider2D, Vector2Int>();
         coorToScript = new Dictionary<Vector2Int, BlockScript>();
         combineColliderToCoorAndDirection = new Dictionary<Collider2D, (Vector2Int, Vector2Int)>();
-        Init(new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(0, 1) });
-    }
-    public void Init(IEnumerable<Vector2Int> coors) {
         foreach (Vector2Int coor in coors) {
             PutBlockAtCoor(Instantiate(prefabBlock, transform).GetComponent<BlockScript>(), coor);
         }
         SetCombineTriggers();
+        Debug.Log("Done initting. Children: " + transform.childCount);
     }
     void PutBlockAtCoor(BlockScript blockScript, Vector2Int coor) {
         GameObject blockObject = blockScript.gameObject;
@@ -73,7 +73,57 @@ public class OminoScript : MonoBehaviour
         SetCombineTriggers();
     }
 
-    void Update() {
-        
+    public void Eviscerate(Collider2D collider) {
+        if (colliderToCoor.Count == 1) {
+            Destroy(gameObject);
+            return;
+        }
+        Vector2Int coor = colliderToCoor[collider];
+        DestroyBlock(coor);
+        // Create new ominos if split into 2+.
+        HashSet<Vector2Int> coors = new HashSet<Vector2Int>(coorToScript.Keys);
+        coors.ExceptWith(GetConnected(coors.First()));
+        while (coors.Count > 0) {
+            Vector2Int startCoor = coors.First();
+            Vector2 startPosition = transform.position + transform.right * startCoor.x * INTERBLOCK_DISTANCE + transform.up * startCoor.y * INTERBLOCK_DISTANCE;
+            HashSet<Vector2Int> connected = GetConnected(startCoor);
+            var rootedCoors = connected.Select(c => c - startCoor);
+            OminoScript newOmino = SpawnerScript.instance.SpawnEmpty();
+            newOmino.transform.position = startPosition;
+            newOmino.transform.rotation = transform.rotation;
+            newOmino.Init(rootedCoors);
+            foreach (Vector2Int c in connected) {
+                DestroyBlock(c);
+            }
+            coors.ExceptWith(connected);
+        }
+        SetCombineTriggers();
+    }
+    void DestroyBlock(Vector2Int coor) {
+        Collider2D collider = coorToScript[coor].c2d;
+        colliderToCoor.Remove(collider);
+        BlockScript blockScript = coorToScript[coor];
+        coorToScript.Remove(coor);
+        foreach (Collider2D c in blockScript.combineColliders) {
+            combineColliderToCoorAndDirection.Remove(c);
+        }
+        Destroy(blockScript.gameObject);
+    }
+    HashSet<Vector2Int> GetConnected(Vector2Int coor) {
+        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        queue.Enqueue(coor);
+        HashSet<Vector2Int> seen = new HashSet<Vector2Int>();
+        seen.Add(coor);
+        while (queue.Count > 0) {
+            Vector2Int current = queue.Dequeue();
+            foreach (Vector2Int direction in NEIGHBOR_ORDER) {
+                Vector2Int neighbor = current + direction;
+                if (!seen.Contains(neighbor) && coorToScript.ContainsKey(neighbor)) {
+                    queue.Enqueue(neighbor);
+                    seen.Add(neighbor);
+                }
+            }
+        }
+        return seen;
     }
 }
