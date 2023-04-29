@@ -1,3 +1,4 @@
+using Assets.Code;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,6 +8,7 @@ public class BlockScript : MonoBehaviour
 {
     static float EVISCERATION_TIME = 1;
 
+    public Transform spritesTransform;
     public Collider2D c2d;
     public Collider2D[] combineColliders;
     public SpriteRenderer[] combineGlows;
@@ -14,10 +16,22 @@ public class BlockScript : MonoBehaviour
 
     public OminoScript omino;
 
+    public bool combineLerping;
+    Vector3 lerpV, lerpAV;
     public bool beingEviscerated;
     float eviscerationTime;
 
     void Update() {
+        // Combine lerping.
+        if (combineLerping) {
+            spritesTransform.localPosition = Vector3.SmoothDamp(spritesTransform.localPosition, Vector3.zero, ref lerpV, .1f);
+            spritesTransform.localRotation = Util.SmoothDampQuaternion(spritesTransform.localRotation, Quaternion.identity, ref lerpAV, .1f);
+            if (spritesTransform.localPosition.sqrMagnitude < .1f) {
+                spritesTransform.localPosition = Vector3.zero;
+                spritesTransform.localRotation = Quaternion.identity;
+                combineLerping = false;
+            }
+        }
         // Evisceration.
         eviscerationTime = beingEviscerated ? (eviscerationTime + Time.deltaTime) : 0;
         eviscerationOverlay.enabled = beingEviscerated;

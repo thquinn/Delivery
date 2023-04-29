@@ -11,6 +11,7 @@ public class OminoScript : MonoBehaviour
 
     public GameObject prefabBlock;
 
+    public int ID;
     public bool combineEnabled;
 
     protected Dictionary<Collider2D, Vector2Int> colliderToCoor;
@@ -18,20 +19,25 @@ public class OminoScript : MonoBehaviour
     protected Dictionary<Collider2D, (Vector2Int, Vector2Int)> combineColliderToCoorAndDirection;
 
     public void Init(IEnumerable<Vector2Int> coors) {
-        Debug.Log($"Initting with {coors.Count()} coors.");
         colliderToCoor = new Dictionary<Collider2D, Vector2Int>();
         coorToScript = new Dictionary<Vector2Int, BlockScript>();
         combineColliderToCoorAndDirection = new Dictionary<Collider2D, (Vector2Int, Vector2Int)>();
         foreach (Vector2Int coor in coors) {
             PutBlockAtCoor(Instantiate(prefabBlock, transform).GetComponent<BlockScript>(), coor);
         }
-        SetCombineTriggers();
-        Debug.Log("Done initting. Children: " + transform.childCount);
+        FinalizeOmino();
     }
-    void PutBlockAtCoor(BlockScript blockScript, Vector2Int coor) {
+    void PutBlockAtCoor(BlockScript blockScript, Vector2Int coor, Transform oldTransform = null) {
+        Vector3 oldPosition = oldTransform == null ? Vector3.zero : oldTransform.position;
+        Quaternion oldRotation = oldTransform == null ? Quaternion.identity : oldTransform.rotation;
         GameObject blockObject = blockScript.gameObject;
         blockObject.transform.localPosition = new Vector3(coor.x * INTERBLOCK_DISTANCE, coor.y * INTERBLOCK_DISTANCE);
         blockObject.transform.localRotation = Quaternion.identity;
+        if (oldTransform != null) {
+            blockScript.spritesTransform.position = oldPosition;
+            blockScript.spritesTransform.rotation = Util.GetMinRotationMod90(oldRotation, transform.rotation.eulerAngles.z);
+            blockScript.combineLerping = true;
+        }
         colliderToCoor[blockObject.GetComponent<Collider2D>()] = coor;
         blockScript.omino = this;
         coorToScript[coor] = blockScript;
@@ -39,7 +45,9 @@ public class OminoScript : MonoBehaviour
             combineColliderToCoorAndDirection[blockScript.combineColliders[i]] = (coor, NEIGHBOR_ORDER[i]);
         }
     }
-    void SetCombineTriggers() {
+    void FinalizeOmino() {
+        ID = Util.GetCanonicalPolyominoID(coorToScript.Keys);
+        Debug.Log("Assigned ID: " + ID);
         foreach (var kvp in coorToScript) {
             for (int i = 0; i < NEIGHBOR_ORDER.Length; i++) {
                 kvp.Value.combineColliders[i].gameObject.SetActive(!coorToScript.ContainsKey(kvp.Key + NEIGHBOR_ORDER[i]));
@@ -67,10 +75,10 @@ public class OminoScript : MonoBehaviour
             }
             Vector2Int newCoor = combineOrigin + coorOffset;
             kvp.Value.transform.parent = transform;
-            PutBlockAtCoor(kvp.Value, newCoor);
+            PutBlockAtCoor(kvp.Value, newCoor, kvp.Value.transform);
         }
         Destroy(otherOmino.gameObject);
-        SetCombineTriggers();
+        FinalizeOmino();
     }
 
     public void Eviscerate(Collider2D collider) {
@@ -97,7 +105,7 @@ public class OminoScript : MonoBehaviour
             }
             coors.ExceptWith(connected);
         }
-        SetCombineTriggers();
+        FinalizeOmino();
     }
     void DestroyBlock(Vector2Int coor) {
         Collider2D collider = coorToScript[coor].c2d;
