@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class SpawnerScript : MonoBehaviour
 {
-    static float ARENA_RADIUS = 100;
-    static int MAX_ZONE_COUNT = 3;
     static float PIECE_SPAWN_DISTANCE_MULT = 3;
     static float ZONE_SPAWN_DISTANCE_MULT = 5;
+    static Vector2Int[] STARTING_TARGET = new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(1, 0) };
+    static Vector2Int[] MONOMINO = new Vector2Int[] { new Vector2Int(0, 0) };
 
     public static SpawnerScript instance;
 
@@ -17,13 +17,28 @@ public class SpawnerScript : MonoBehaviour
     public LayerMask layerMaskSpawn, layerMaskZone, layerMaskBlock;
 
     List<GameObject> deliveryZones;
+    int maxZoneCount;
 
     void Start() {
         instance = this;
         deliveryZones = new List<GameObject>();
+        GameObject zone = Instantiate(prefabZone);
+        zone.transform.position = new Vector3(-25, 0, 0);
+        zone.GetComponent<DeliveryZoneScript>().Init(STARTING_TARGET);
+        deliveryZones.Add(zone);
+        GameObject omino = Instantiate(prefabOmino);
+        omino.transform.position = new Vector3(20, -5, 0);
+        omino.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
+        omino.GetComponent<OminoScript>().Init(MONOMINO);
+        omino = Instantiate(prefabOmino);
+        omino.transform.position = new Vector3(27, 6, 0);
+        omino.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
+        omino.GetComponent<OminoScript>().Init(MONOMINO);
     }
 
     void Update() {
+        float area = Mathf.PI * Mathf.Pow(GameHelper.instance.arenaRadius, 2);
+        maxZoneCount = Mathf.RoundToInt(area / 12000);
         TrySpawnZone();
         TrySpawnOmino();
     }
@@ -33,11 +48,16 @@ public class SpawnerScript : MonoBehaviour
                 deliveryZones.RemoveAt(i);
             }
         }
-        if (deliveryZones.Count >= MAX_ZONE_COUNT) {
+        if (deliveryZones.Count >= maxZoneCount) {
             return;
         }
-        Vector2 position = Util.GetRandomPointWithinRadius(ARENA_RADIUS);
-        int size = Random.Range(4, 9);
+        Vector2 position = Util.GetRandomPointWithinRadius(GameHelper.instance.arenaRadius);
+        Vector2 playerPosition = PlayerScript.instance.transform.position;
+        if ((position - playerPosition).magnitude < GameHelper.instance.arenaRadius * .33f) {
+            return;
+        }
+        float maxSize = 5 + GameHelper.instance.timePassed / 30;
+        int size = Mathf.RoundToInt(Random.Range(4, maxSize));
         List<Vector2Int> coors = GetRandomOmino(size);
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
         float checkRadius = Mathf.Sqrt(Mathf.Pow(dimensions.x / 2f, 2) + Mathf.Pow(dimensions.y / 2f, 2)) * OminoScript.INTERBLOCK_DISTANCE;
@@ -55,19 +75,23 @@ public class SpawnerScript : MonoBehaviour
         }
     }
     void TrySpawnOmino() {
-        if (deliveryZones.Count < MAX_ZONE_COUNT) {
+        if (deliveryZones.Count < maxZoneCount) {
             return;
         }
-        Vector2 position = Util.GetRandomPointWithinRadius(ARENA_RADIUS);
+        Vector2 position = Util.GetRandomPointWithinRadius(GameHelper.instance.arenaRadius);
         int size = -1;
+        float max = 8;
         while (size <= 0) {
-            size = Mathf.RoundToInt(Random.Range(-2.5f, 4.5f) + Random.Range(-2.5f, 4.5f));
+            size = Mathf.RoundToInt(Random.Range(-max, max) + Random.Range(-max, max));
         }
-        if (PieceCanSpawnHere(position, size)) {
+        List<Vector2Int> coors = GetRandomOmino(size);
+        Vector2Int dimensions = Util.GetCoorsDimensions(coors);
+        float hypot = Mathf.Sqrt(dimensions.x * dimensions.x + dimensions.y * dimensions.y);
+        if (PieceCanSpawnHere(position, hypot)) {
             GameObject omino = Instantiate(prefabOmino);
             omino.transform.position = position;
             omino.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
-            omino.GetComponent<OminoScript>().Init(GetRandomOmino(size));
+            omino.GetComponent<OminoScript>().Init(coors);
         }
     }
     bool ZoneCanSpawnHere(Vector2 position, float checkRadius) {
@@ -77,8 +101,8 @@ public class SpawnerScript : MonoBehaviour
         Collider2D c2d = Physics2D.OverlapCircle(position, checkRadius * ZONE_SPAWN_DISTANCE_MULT, layerMaskZone);
         return c2d == null;
     }
-    bool PieceCanSpawnHere(Vector2 position, int size) {
-        float checkRadius = size * OminoScript.INTERBLOCK_DISTANCE;
+    bool PieceCanSpawnHere(Vector2 position, float hypot) {
+        float checkRadius = hypot * OminoScript.INTERBLOCK_DISTANCE;
         if (Util.IsPointOnCamera(position, checkRadius)) {
             return false;
         }

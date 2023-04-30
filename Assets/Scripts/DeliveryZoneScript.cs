@@ -66,8 +66,10 @@ public class DeliveryZoneScript : MonoBehaviour
             HashSet<OminoScript> ominos = new HashSet<OminoScript>(colliders.Values);
             foreach (OminoScript omino in ominos) {
                 if (omino.ID == targetID && omino.ContainsAll(colliders)) {
+                    GameHelper.instance.Deliver(omino);
                     Destroy(omino.gameObject);
                     Instantiate(prefabOminoDisappearVFX).GetComponent<OminoDisappearVFXScript>().Init(omino);
+                    SFXHelper.instance.ZoneClear();
                     destroying = true;
                     break;
                 }

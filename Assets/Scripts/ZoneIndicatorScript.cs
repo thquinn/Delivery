@@ -20,7 +20,6 @@ public class ZoneIndicatorScript : MonoBehaviour
 
     public void Init(DeliveryZoneScript deliveryZoneScript) {
         canvasGroup.alpha = 0;
-        transform.SetAsFirstSibling();
         rtCanvas = transform.parent.GetComponent<RectTransform>();
         cam = Camera.main;
         deliveryZone = deliveryZoneScript.gameObject;

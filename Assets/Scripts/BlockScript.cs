@@ -47,6 +47,7 @@ public class BlockScript : MonoBehaviour
                         }
                     }
                     connectVFX.Clear();
+                    SFXHelper.instance.Snap();
                 }
             }
         }

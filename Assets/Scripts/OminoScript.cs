@@ -126,6 +126,7 @@ public class OminoScript : MonoBehaviour
         }
         if (particle) {
             ParticleHelper.instance.Eviscerate(blockScript.transform.position);
+            SFXHelper.instance.Eviscerate();
         }
         Destroy(blockScript.gameObject);
     }

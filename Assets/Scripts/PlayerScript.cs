@@ -4,10 +4,22 @@ using UnityEngine;
 
 public class PlayerScript : MonoBehaviour
 {
+    public static PlayerScript instance;
     static float SPEED = 20;
 
     public Rigidbody2D rb2d;
     public GrabberScript grabberScript;
+
+    public float boostSeconds;
+
+    void Start() {
+        instance = this;
+    }
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Escape) && !Application.isEditor && Application.platform != RuntimePlatform.WebGLPlayer) {
+            Application.Quit();
+        }
+    }
 
     void FixedUpdate() {
         UpdateInput();

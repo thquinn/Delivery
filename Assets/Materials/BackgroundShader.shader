@@ -4,6 +4,7 @@ Shader "thquinn/BackgroundShader"
     {
         _BGColor ("BG Color", Color) = (1,1,1,1)
         _GridColor ("Grid Color", Color) = (1,1,1,1)
+        _EdgeColor ("Edge Color", Color) = (1,1,1,1)
         _GrainTex ("Grain (RGB)", 2D) = "white" {}
     }
         SubShader
@@ -33,8 +34,9 @@ Shader "thquinn/BackgroundShader"
         float4 worldSpacePos : TEXCOORD3;
     };
 
-    fixed4 _BGColor, _GridColor;
+    fixed4 _BGColor, _GridColor, _EdgeColor;
     sampler2D _GrainTex;
+    float _ArenaRadius = 100;
 
     v2f vert (appdata v)
     {
@@ -78,6 +80,11 @@ Shader "thquinn/BackgroundShader"
         float grain = 1 - tex2D(_GrainTex, grainUV);
         // Combine.
         fixed4 c = lerp(_BGColor, _GridColor, t + t2 * .4 + grain * 3);
+        // Edge fade.
+        float distance = length(i.worldSpacePos.xy);
+        float arenaRadius = max(100, _ArenaRadius);
+        float edgeT = smoothstep(arenaRadius, arenaRadius + 20, distance);
+        c = lerp(c, _EdgeColor, edgeT);
         return c;
     }
         ENDCG
