@@ -61,7 +61,7 @@ public class SpawnerScript : MonoBehaviour
         Vector2 position = Util.GetRandomPointWithinRadius(ARENA_RADIUS);
         int size = -1;
         while (size <= 0) {
-            size = Random.Range(-3, 4) + Random.Range(-3, 4);
+            size = Mathf.RoundToInt(Random.Range(-2.5f, 4.5f) + Random.Range(-2.5f, 4.5f));
         }
         if (PieceCanSpawnHere(position, size)) {
             GameObject omino = Instantiate(prefabOmino);

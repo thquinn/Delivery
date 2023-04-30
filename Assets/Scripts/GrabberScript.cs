@@ -7,7 +7,7 @@ using UnityEngine;
 public class GrabberScript : MonoBehaviour
 {
     static float DISTANCE = 10;
-    static float STRENGTH = 1000;
+    static float STRENGTH = 2000;
     static Vector3 SCALE_INNER = new Vector3(.85f, .85f, 1);
     static Vector3 SCALE_OUTER = new Vector3(1.2f, 1.2f, 1);
 

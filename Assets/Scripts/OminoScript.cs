@@ -58,6 +58,7 @@ public class OminoScript : MonoBehaviour
     }
 
     public void Combine(Collider2D thisCollider, Collider2D otherCollider) {
+        HashSet<Vector2Int> originalCoors = new HashSet<Vector2Int>(coorToScript.Keys);
         OminoScript otherOmino = otherCollider.transform.parent.parent.GetComponent<OminoScript>();
         if (otherOmino == this) {
             return;
@@ -78,18 +79,24 @@ public class OminoScript : MonoBehaviour
             Vector2Int newCoor = combineOrigin + coorOffset;
             kvp.Value.transform.parent = transform;
             PutBlockAtCoor(kvp.Value, newCoor, kvp.Value.transform);
+            // Queue VFX for attaching.
+            foreach (Vector2Int direction in NEIGHBOR_ORDER) {
+                if (originalCoors.Contains(newCoor + direction)) {
+                    kvp.Value.QueueConnectVFX(direction);
+                }
+            }
         }
         Destroy(otherOmino.gameObject);
         FinalizeOmino();
     }
 
     public void Eviscerate(Collider2D collider) {
-        if (colliderToCoor.Count == 1) {
+        Vector2Int coor = colliderToCoor[collider];
+        DestroyBlock(coor, true);
+        if (colliderToCoor.Count == 0) {
             Destroy(gameObject);
             return;
         }
-        Vector2Int coor = colliderToCoor[collider];
-        DestroyBlock(coor);
         // Create new ominos if split into 2+.
         HashSet<Vector2Int> coors = new HashSet<Vector2Int>(coorToScript.Keys);
         coors.ExceptWith(GetConnected(coors.First()));
@@ -109,13 +116,16 @@ public class OminoScript : MonoBehaviour
         }
         FinalizeOmino();
     }
-    void DestroyBlock(Vector2Int coor) {
+    void DestroyBlock(Vector2Int coor, bool particle = false) {
         Collider2D collider = coorToScript[coor].c2d;
         colliderToCoor.Remove(collider);
         BlockScript blockScript = coorToScript[coor];
         coorToScript.Remove(coor);
         foreach (Collider2D c in blockScript.combineColliders) {
             combineColliderToCoorAndDirection.Remove(c);
+        }
+        if (particle) {
+            ParticleHelper.instance.Eviscerate(blockScript.transform.position);
         }
         Destroy(blockScript.gameObject);
     }

@@ -8,6 +8,19 @@ namespace Assets.Code {
     public static class Util {
         static Camera cam;
 
+        public static float Damp(float source, float target, float smoothing, float dt) {
+            return Mathf.Lerp(source, target, 1 - Mathf.Pow(smoothing, dt));
+        }
+        public static Vector2 Damp(Vector2 source, Vector2 target, float smoothing, float dt) {
+            return Vector2.Lerp(source, target, 1 - Mathf.Pow(smoothing, dt));
+        }
+        public static Vector3 Damp(Vector3 source, Vector3 target, float smoothing, float dt) {
+            return Vector3.Lerp(source, target, 1 - Mathf.Pow(smoothing, dt));
+        }
+        public static Quaternion Damp(Quaternion source, Quaternion target, float smoothing, float dt) {
+            return Quaternion.Lerp(source, target, 1 - Mathf.Pow(smoothing, dt));
+        }
+
         public static Vector2 GetRandomPointWithinRadius(float radius) {
             float rSq = radius * radius;
             while (true) {

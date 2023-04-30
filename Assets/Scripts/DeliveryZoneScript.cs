@@ -48,6 +48,7 @@ public class DeliveryZoneScript : MonoBehaviour
         for (int i = 0; i < orbitalCount; i++) {
             float angle = Mathf.PI * 2 / orbitalCount * i;
             orbital.transform.localPosition = new Vector3(Mathf.Cos(angle) * distance, Mathf.Sin(angle) * distance);
+            orbital.transform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
             orbitalTransforms.Add(orbital.transform);
             if (i != orbitalCount - 1) {
                 orbital = Instantiate(orbital, orbitalsTransform);
@@ -66,7 +67,7 @@ public class DeliveryZoneScript : MonoBehaviour
         // Orbitals.
         orbitalsTransform.Rotate(0, 0, Time.deltaTime * 20);
         foreach (Transform t in orbitalTransforms) {
-            t.rotation = Quaternion.identity;
+            //t.rotation = Quaternion.identity;
         }
     }
 

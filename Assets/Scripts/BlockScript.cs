@@ -8,6 +8,8 @@ public class BlockScript : MonoBehaviour
 {
     static float EVISCERATION_TIME = 1;
 
+    public GameObject prefabConnectVFX;
+
     public Transform spritesTransform;
     public Collider2D c2d;
     public Collider2D[] combineColliders;
@@ -20,6 +22,7 @@ public class BlockScript : MonoBehaviour
     Vector3 lerpV, lerpAV;
     public bool beingEviscerated;
     float eviscerationTime;
+    List<Vector2Int> connectVFX;
 
     void Update() {
         // Combine lerping.
@@ -30,6 +33,21 @@ public class BlockScript : MonoBehaviour
                 spritesTransform.localPosition = Vector3.zero;
                 spritesTransform.localRotation = Quaternion.identity;
                 combineLerping = false;
+                if (connectVFX != null) {
+                    foreach (Vector2Int direction in connectVFX) {
+                        GameObject connectVFX = Instantiate(prefabConnectVFX);
+                        Vector3 position = transform.position;
+                        position.z = connectVFX.transform.position.z;
+                        Vector3 direction3 = new Vector3(direction.x, direction.y, 0) * OminoScript.INTERBLOCK_DISTANCE / 2;
+                        position += transform.TransformVector(direction3);
+                        connectVFX.transform.position = position;
+                        connectVFX.transform.rotation = transform.rotation;
+                        if (direction == Vector2Int.left || direction == Vector2Int.right) {
+                            connectVFX.transform.Rotate(0, 0, 90);
+                        }
+                    }
+                    connectVFX.Clear();
+                }
             }
         }
         // Evisceration.
@@ -60,5 +78,12 @@ public class BlockScript : MonoBehaviour
         if (omino.combineEnabled) {
             omino.Combine(thisCollider, otherCollider);
         }
+    }
+
+    public void QueueConnectVFX(Vector2Int direction) {
+        if (connectVFX == null) {
+            connectVFX = new List<Vector2Int>();
+        }
+        connectVFX.Add(direction);
     }
 }
