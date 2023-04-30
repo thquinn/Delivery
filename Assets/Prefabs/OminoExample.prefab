@@ -45,3 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabBlockExample: {fileID: 1685708062931895575, guid: 916452b437e29c44dacf5764bba99fb7, type: 3}
+  prefabBlockExampleImage: {fileID: 4239987396708773138, guid: e815c6e6b655c8c4d8b8e4c5e579b3be, type: 3}

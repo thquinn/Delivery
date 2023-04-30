@@ -6,13 +6,14 @@ using UnityEngine;
 
 public class DeliveryZoneScript : MonoBehaviour
 {
-    public GameObject prefabOminoExample;
+    public GameObject prefabOminoExample, prefabZoneIndicator;
 
     public CircleCollider2D circleCollider;
     public GameObject circleObject;
     public Transform orbitalsTransform;
     public Color orbitalColor;
 
+    public IEnumerable<Vector2Int> coors;
     Dictionary<Collider2D, OminoScript> colliders;
     List<Transform> orbitalTransforms;
     int targetID;
@@ -21,6 +22,7 @@ public class DeliveryZoneScript : MonoBehaviour
         colliders = new Dictionary<Collider2D, OminoScript>();
     }
     public void Init(IEnumerable<Vector2Int> coors) {
+        this.coors = coors;
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
         float hypot = Mathf.Sqrt(dimensions.x * dimensions.x + dimensions.y * dimensions.y);
         float scale = hypot * 6f / 5;
@@ -31,6 +33,9 @@ public class DeliveryZoneScript : MonoBehaviour
         ominoExample.GetComponent<OminoExampleScript>().Init(coors);
         ominoExample.transform.localPosition = new Vector3(0, 0, 2.9f);
         ominoExample.transform.localRotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
+        // Indicator.
+        RectTransform rtCanvas = GameObject.FindGameObjectWithTag("Canvas").GetComponent<RectTransform>();
+        Instantiate(prefabZoneIndicator, rtCanvas).GetComponent<ZoneIndicatorScript>().Init(this);
         // Orbitals.
         GameObject orbital = Instantiate(ominoExample, orbitalsTransform);
         orbital.transform.localScale = new Vector3(1 / hypot, 1 / hypot, 1);
