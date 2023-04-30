@@ -11,6 +11,8 @@ public class OminoScript : MonoBehaviour
 
     public GameObject prefabBlock;
 
+    public Rigidbody2D rb2d;
+
     public int ID;
     public bool combineEnabled;
 
@@ -47,6 +49,7 @@ public class OminoScript : MonoBehaviour
     }
     void FinalizeOmino() {
         ID = Util.GetCanonicalPolyominoID(coorToScript.Keys);
+        rb2d.mass = Size();
         foreach (var kvp in coorToScript) {
             for (int i = 0; i < NEIGHBOR_ORDER.Length; i++) {
                 kvp.Value.combineColliders[i].gameObject.SetActive(!coorToScript.ContainsKey(kvp.Key + NEIGHBOR_ORDER[i]));
@@ -134,6 +137,9 @@ public class OminoScript : MonoBehaviour
         return seen;
     }
 
+    public int Size() {
+        return colliderToCoor.Count;
+    }
     public bool ContainsAll(Dictionary<Collider2D, OminoScript> colliders) {
         return colliderToCoor.Keys.All(c => colliders.ContainsKey(c));
     }

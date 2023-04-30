@@ -7,26 +7,36 @@ using UnityEngine;
 public class GrabberScript : MonoBehaviour
 {
     static float DISTANCE = 10;
+    static float STRENGTH = 1000;
+    static Vector3 SCALE_INNER = new Vector3(.85f, .85f, 1);
+    static Vector3 SCALE_OUTER = new Vector3(1.2f, 1.2f, 1);
 
-    public SpriteRenderer spriteRenderer;
+    public SpriteRenderer grabInnerRenderer, grabOuterRenderer;
     public Rigidbody2D rb2d;
     public FixedJoint2D fixedJoint;
     public LayerMask layerMaskBlock, layerMaskEviscerate;
 
     float lastAngle;
     bool lastGrabbing;
-    OminoScript grabbedOmino;
+    public OminoScript grabbedOmino;
     BlockScript evisceratingBlock;
+    Vector3 scaleVInner, scaleVOuter;
+    float vAngle;
+
+    void Start() {
+        Cursor.visible = false;
+    }
 
     void FixedUpdate() {
         float angle = GetAngle();
-        if (!float.IsNaN(angle)) {
-            Vector3 localPosition = new Vector3(DISTANCE * Mathf.Cos(angle), DISTANCE * Mathf.Sin(angle), -1);
-            rb2d.position = transform.parent.position + localPosition;
-            if (!float.IsNaN(lastAngle)) {
-                rb2d.rotation -= Mathf.DeltaAngle(angle * Mathf.Rad2Deg, lastAngle * Mathf.Rad2Deg);
-            }
+        if (grabbedOmino != null) {
+            angle = Mathf.SmoothDampAngle(lastAngle * Mathf.Rad2Deg, angle * Mathf.Rad2Deg, ref vAngle, .1f, STRENGTH / grabbedOmino.Size(), Time.fixedDeltaTime);
+            angle *= Mathf.Deg2Rad;
         }
+        Vector3 localPosition = new Vector3(DISTANCE * Mathf.Cos(angle), DISTANCE * Mathf.Sin(angle), -1);
+        rb2d.MovePosition(transform.parent.position + localPosition);
+        rb2d.rotation -= Mathf.DeltaAngle(angle * Mathf.Rad2Deg, lastAngle * Mathf.Rad2Deg);
+        // Grabbing.
         bool grabbing = IsGrabbing();
         if (!lastGrabbing && grabbing) {
             Rigidbody2D closestRB = Util.GetClosest(transform.position, 1.1f, layerMaskBlock);
@@ -44,6 +54,9 @@ public class GrabberScript : MonoBehaviour
         if (grabbedOmino != null) {
             grabbedOmino.combineEnabled = IsCombineEnabled();
         }
+        grabInnerRenderer.transform.localScale = Vector3.SmoothDamp(grabInnerRenderer.transform.localScale, grabbing ? Vector3.one : SCALE_INNER, ref scaleVInner, .05f);
+        grabOuterRenderer.transform.localScale = Vector3.SmoothDamp(grabOuterRenderer.transform.localScale, grabbing ? Vector3.one : SCALE_OUTER, ref scaleVOuter, .05f);
+        // Eviscerating.
         if (IsEviscerating()) {
             if (evisceratingBlock != null) {
                 evisceratingBlock.beingEviscerated = false;
@@ -65,7 +78,7 @@ public class GrabberScript : MonoBehaviour
         if (mouseDelta.sqrMagnitude > 5) {
             return Mathf.Atan2(mouseDelta.y, mouseDelta.x);
         }
-        return float.NaN;
+        return lastAngle;
     }
     bool IsGrabbing() {
         return Input.GetMouseButton(0);

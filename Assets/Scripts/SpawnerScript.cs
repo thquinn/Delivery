@@ -43,7 +43,7 @@ public class SpawnerScript : MonoBehaviour
         float checkRadius = Mathf.Sqrt(Mathf.Pow(dimensions.x / 2f, 2) + Mathf.Pow(dimensions.y / 2f, 2)) * OminoScript.INTERBLOCK_DISTANCE;
         if (ZoneCanSpawnHere(position, checkRadius)) {
             // Remove all ominos that overlap.
-            HashSet<OminoScript> ominos = new HashSet<OminoScript>(Physics2D.OverlapCircleAll(position, checkRadius * ZONE_SPAWN_DISTANCE_MULT, layerMaskBlock).Select(c => c.GetComponent<BlockScript>().omino));
+            HashSet<OminoScript> ominos = new HashSet<OminoScript>(Physics2D.OverlapCircleAll(position, checkRadius * 3, layerMaskBlock).Select(c => c.GetComponent<BlockScript>().omino));
             foreach (OminoScript omino in ominos) {
                 Destroy(omino.gameObject);
             }

@@ -47,6 +47,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabBlock: {fileID: 6604296448550994255, guid: 733057349b8ac754e967fe4eb57dbfb0, type: 3}
+  rb2d: {fileID: 2577552088929716897}
   ID: 0
   combineEnabled: 0
 --- !u!50 &2577552088929716897
@@ -61,7 +62,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 2
+  m_Mass: 1
   m_LinearDrag: 5
   m_AngularDrag: 5
   m_GravityScale: 1

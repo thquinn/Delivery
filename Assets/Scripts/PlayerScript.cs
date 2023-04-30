@@ -7,16 +7,20 @@ public class PlayerScript : MonoBehaviour
     static float SPEED = 20;
 
     public Rigidbody2D rb2d;
-
-    void Start() {
-        
-    }
+    public GrabberScript grabberScript;
 
     void FixedUpdate() {
         UpdateInput();
     }
     void UpdateInput() {
-        rb2d.velocity = GetMovementVector() * SPEED;
+        float speed = SPEED;
+        if (grabberScript.grabbedOmino != null) {
+            float size = grabberScript.grabbedOmino.Size();
+            float multiplier = 1 / (.2f * size + 1);
+            speed *= Mathf.Lerp(multiplier, 1, .75f);
+        }
+        Vector3 desiredVelocity = GetMovementVector() * speed;
+        rb2d.velocity = Vector3.Lerp(rb2d.velocity, desiredVelocity, .25f);
     }
     Vector2 GetMovementVector() {
         float x = Input.GetKey(KeyCode.D) ? 1 : (Input.GetKey(KeyCode.A) ? -1 : 0);
