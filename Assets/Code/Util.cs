@@ -73,7 +73,7 @@ namespace Assets.Code {
             s = 1;
             v = 1;
             Color output = Color.HSVToRGB(h, s, v);
-            output.a = .25f;
+            output.a = .5f;
             ORBITAL_COLOR_MEMO[c] = output;
             return output;
         }
@@ -222,6 +222,19 @@ namespace Assets.Code {
 
         public override int GetHashCode() {
             return hash;
+        }
+    }
+
+    public static class ArrayExtensions {
+        public static T[] Shuffle<T>(this T[] array) {
+            int n = array.Length;
+            for (int i = 0; i < n; i++) {
+                int r = i + UnityEngine.Random.Range(0, n - i);
+                T t = array[r];
+                array[r] = array[i];
+                array[i] = t;
+            }
+            return array;
         }
     }
 }

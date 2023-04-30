@@ -157,4 +157,8 @@ public class OminoScript : MonoBehaviour
     public bool ContainsAll(Dictionary<Collider2D, OminoScript> colliders) {
         return colliderToCoor.Keys.All(c => colliders.ContainsKey(c));
     }
+
+    public int GetMultiplier() {
+        return 1 + coorToScript.Values.Count(s => s.color > 0);
+    }
 }

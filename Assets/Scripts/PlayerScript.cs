@@ -19,6 +19,7 @@ public class PlayerScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Escape) && !Application.isEditor && Application.platform != RuntimePlatform.WebGLPlayer) {
             Application.Quit();
         }
+        boostSeconds = Mathf.Max(0, boostSeconds - Time.deltaTime);
     }
 
     void FixedUpdate() {
@@ -26,6 +27,8 @@ public class PlayerScript : MonoBehaviour
     }
     void UpdateInput() {
         float speed = SPEED;
+        float boostMultiplier = Mathf.Lerp(1, 1.5f, Mathf.Clamp01(Mathf.InverseLerp(0, 2, boostSeconds)));
+        speed *= boostMultiplier;
         if (grabberScript.grabbedOmino != null) {
             float size = grabberScript.grabbedOmino.Size();
             float multiplier = 1 / (.2f * size + 1);

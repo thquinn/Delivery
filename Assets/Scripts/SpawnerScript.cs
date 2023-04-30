@@ -16,11 +16,14 @@ public class SpawnerScript : MonoBehaviour
     public GameObject prefabZone, prefabOmino;
     public LayerMask layerMaskSpawn, layerMaskZone, layerMaskBlock;
 
+    List<OminoScript> ominos;
     List<GameObject> deliveryZones;
     int maxZoneCount;
+    int lastSecond;
 
     void Start() {
         instance = this;
+        ominos = new List<OminoScript>();
         deliveryZones = new List<GameObject>();
         GameObject zone = Instantiate(prefabZone);
         zone.transform.position = new Vector3(-25, 0, 0);
@@ -39,8 +42,27 @@ public class SpawnerScript : MonoBehaviour
     void Update() {
         float area = Mathf.PI * Mathf.Pow(GameHelper.instance.arenaRadius, 2);
         maxZoneCount = Mathf.RoundToInt(area / 12000);
+        DespawnRandomOmino();
         TrySpawnZone();
         TrySpawnOmino();
+    }
+    void DespawnRandomOmino() {
+        // Every second, despawn 2% of ominos to make room for new ones (i.e. gold blocks).
+        int second = Mathf.FloorToInt(Time.time);
+        if (second <= lastSecond) {
+            return;
+        }
+        lastSecond = second;
+        for (int i = ominos.Count - 1; i >= 0; i--) {
+            if (ominos[i] == null) {
+                ominos.RemoveAt(i);
+            }
+        }
+        foreach (OminoScript omino in ominos) {
+            if (Random.value < .02 && !Util.IsPointOnCamera(omino.transform.position, omino.Size() * OminoScript.INTERBLOCK_DISTANCE)) {
+                Destroy(omino.gameObject);
+            }
+        }
     }
     void TrySpawnZone() {
         for (int i = deliveryZones.Count - 1; i >= 0; i--) {
@@ -56,7 +78,7 @@ public class SpawnerScript : MonoBehaviour
         if ((position - playerPosition).magnitude < GameHelper.instance.arenaRadius * .33f) {
             return;
         }
-        float maxSize = 4.5f + GameHelper.instance.timePassed / 30;
+        float maxSize = 4.5f + Mathf.Pow(GameHelper.instance.timePassed / 30, .6f);
         int size = Mathf.RoundToInt(Random.Range(4, maxSize));
         List<Vector2Int> coors = GetRandomOmino(size);
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
@@ -91,7 +113,9 @@ public class SpawnerScript : MonoBehaviour
             GameObject omino = Instantiate(prefabOmino);
             omino.transform.position = position;
             omino.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
-            omino.GetComponent<OminoScript>().Init(AddOminoColors(coors));
+            OminoScript ominoScript = omino.GetComponent<OminoScript>();
+            ominoScript.Init(AddOminoColors(coors));
+            ominos.Add(ominoScript);
         }
     }
     bool ZoneCanSpawnHere(Vector2 position, float checkRadius) {
@@ -137,7 +161,17 @@ public class SpawnerScript : MonoBehaviour
         return omino.ToList();
     }
     List<Vector3Int> AddOminoColors(IEnumerable<Vector2Int> coors) {
-        float goldChance = .5f;// Mathf.Pow(Mathf.Max(0, GameHelper.instance.timePassed) / 250, .5f) * .2f;
-        return coors.Select(c => new Vector3Int(c.x, c.y, Random.value < goldChance ? 1 : 0)).ToList();
+        float goldChance = Mathf.Pow(Mathf.Max(0, GameHelper.instance.timePassed - 120) / 250, .5f) * .2f;
+        int numGolds = 0;
+        foreach (var c in coors) {
+            numGolds += Random.value < goldChance ? 1 : 0;
+        }
+        numGolds = Mathf.Min(numGolds, Mathf.RoundToInt(GameHelper.instance.timePassed * .0066f));
+        int[] colors = new int[coors.Count()];
+        for (int i = 0; i < numGolds; i++) {
+            colors[i] = 1;
+        }
+        colors.Shuffle();
+        return coors.Zip(colors, (coor, color) => new Vector3Int(coor.x, coor.y, color)).ToList();
     }
 }

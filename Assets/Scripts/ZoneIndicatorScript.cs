@@ -37,7 +37,8 @@ public class ZoneIndicatorScript : MonoBehaviour
         }
         Vector2 zonePos = deliveryZone.transform.position;
         Vector2 camPos = cam.transform.position;
-        canvasGroup.alpha = Mathf.SmoothDamp(canvasGroup.alpha, Util.IsPointOnCamera(zonePos, radius) ? 0 : 1, ref vAlpha, .1f);
+        bool show = !GameHelper.instance.paused && !Util.IsPointOnCamera(zonePos, radius);
+        canvasGroup.alpha = Mathf.SmoothDamp(canvasGroup.alpha, show ? 1 : 0, ref vAlpha, .1f);
 
         Vector2 normalizedDelta = (zonePos - camPos).normalized;
         Vector2 cornerVector = (rtCanvas.sizeDelta / 2) - MARGIN;

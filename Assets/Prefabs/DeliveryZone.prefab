@@ -181,7 +181,7 @@ MonoBehaviour:
   prefabOminoExample: {fileID: 3181998297985640073, guid: 592cbf3f59e82f64ea62982cfe0a6e3d, type: 3}
   prefabZoneIndicator: {fileID: 6378848682140801498, guid: e7cfabcbf88ef2441bb73b4e6d4c1725, type: 3}
   prefabOminoDisappearVFX: {fileID: 2619360380135073353, guid: aca4a3fb1ab2f354f92f4de5cea72e14, type: 3}
+  prefabScorePopup: {fileID: 4442837413792881550, guid: 5568086eb9e1b2f45bf563fa1c5c0db1, type: 3}
   circleCollider: {fileID: 7286205756532935536}
   circleRenderer: {fileID: 7286205756231888928}
   orbitalsTransform: {fileID: 7542673276837384066}
-  orbitalColor: {r: 0, g: 0.36029434, b: 1, a: 0.32941177}
