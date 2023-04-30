@@ -17,7 +17,7 @@ public class OminoScript : MonoBehaviour
     public bool combineEnabled;
 
     protected Dictionary<Collider2D, Vector2Int> colliderToCoor;
-    protected Dictionary<Vector2Int, BlockScript> coorToScript;
+    public Dictionary<Vector2Int, BlockScript> coorToScript;
     protected Dictionary<Collider2D, (Vector2Int, Vector2Int)> combineColliderToCoorAndDirection;
 
     public void Init(IEnumerable<Vector2Int> coors) {

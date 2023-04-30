@@ -6,7 +6,7 @@ using UnityEngine;
 public class ConnectVFXScript : MonoBehaviour
 {
     static float DURATION = .166f;
-    static Vector3 TARGET_SCALE = new Vector3(1f, 1f, 1);
+    static Vector3 TARGET_SCALE = new Vector3(1.2f, 1.2f, 1);
 
     public SpriteRenderer[] spriteRenderers;
 

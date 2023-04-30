@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class DeliveryZoneScript : MonoBehaviour
 {
-    public GameObject prefabOminoExample, prefabZoneIndicator;
+    public GameObject prefabOminoExample, prefabZoneIndicator, prefabOminoDisappearVFX;
 
     public CircleCollider2D circleCollider;
-    public GameObject circleObject;
+    public SpriteRenderer circleRenderer;
     public Transform orbitalsTransform;
     public Color orbitalColor;
 
@@ -17,6 +17,9 @@ public class DeliveryZoneScript : MonoBehaviour
     Dictionary<Collider2D, OminoScript> colliders;
     List<Transform> orbitalTransforms;
     int targetID;
+    bool destroying;
+    OminoExampleScript ominoExample;
+    List<OminoExampleScript> orbitalOminos;
 
     void Start() {
         colliders = new Dictionary<Collider2D, OminoScript>();
@@ -27,17 +30,18 @@ public class DeliveryZoneScript : MonoBehaviour
         float hypot = Mathf.Sqrt(dimensions.x * dimensions.x + dimensions.y * dimensions.y);
         float scale = hypot * 6f / 5;
         circleCollider.radius = scale * 1.5f;
-        circleObject.transform.localScale = new Vector3(scale, scale, 1);
+        circleRenderer.transform.localScale = new Vector3(scale, scale, 1);
         targetID = Util.GetCanonicalPolyominoID(coors);
-        GameObject ominoExample = Instantiate(prefabOminoExample, transform);
-        ominoExample.GetComponent<OminoExampleScript>().Init(coors);
+        ominoExample = Instantiate(prefabOminoExample, transform).GetComponent<OminoExampleScript>();
+        ominoExample.Init(coors);
         ominoExample.transform.localPosition = new Vector3(0, 0, 2.9f);
         ominoExample.transform.localRotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
         // Indicator.
         RectTransform rtCanvas = GameObject.FindGameObjectWithTag("Canvas").GetComponent<RectTransform>();
         Instantiate(prefabZoneIndicator, rtCanvas).GetComponent<ZoneIndicatorScript>().Init(this);
         // Orbitals.
-        GameObject orbital = Instantiate(ominoExample, orbitalsTransform);
+        orbitalOminos = new List<OminoExampleScript>();
+        GameObject orbital = Instantiate(ominoExample.gameObject, orbitalsTransform);
         orbital.transform.localScale = new Vector3(1 / hypot, 1 / hypot, 1);
         foreach (SpriteRenderer sr in orbital.GetComponentsInChildren<SpriteRenderer>()) {
             sr.color = orbitalColor;
@@ -46,6 +50,7 @@ public class DeliveryZoneScript : MonoBehaviour
         int orbitalCount = Mathf.RoundToInt(scale);
         orbitalTransforms = new List<Transform>(orbitalCount);
         for (int i = 0; i < orbitalCount; i++) {
+            orbitalOminos.Add(orbital.GetComponent<OminoExampleScript>());
             float angle = Mathf.PI * 2 / orbitalCount * i;
             orbital.transform.localPosition = new Vector3(Mathf.Cos(angle) * distance, Mathf.Sin(angle) * distance);
             orbital.transform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
@@ -57,26 +62,49 @@ public class DeliveryZoneScript : MonoBehaviour
     }
 
     void Update() {
-        HashSet<OminoScript> ominos = new HashSet<OminoScript>(colliders.Values);
-        foreach (OminoScript omino in ominos) {
-            if (omino.ID == targetID && omino.ContainsAll(colliders)) {
-                Destroy(omino.gameObject);
-                Destroy(gameObject);
+        if (!destroying) {
+            HashSet<OminoScript> ominos = new HashSet<OminoScript>(colliders.Values);
+            foreach (OminoScript omino in ominos) {
+                if (omino.ID == targetID && omino.ContainsAll(colliders)) {
+                    Destroy(omino.gameObject);
+                    Instantiate(prefabOminoDisappearVFX).GetComponent<OminoDisappearVFXScript>().Init(omino);
+                    destroying = true;
+                    break;
+                }
             }
         }
         // Orbitals.
         orbitalsTransform.Rotate(0, 0, Time.deltaTime * 20);
+        /*
         foreach (Transform t in orbitalTransforms) {
-            //t.rotation = Quaternion.identity;
+            t.rotation = Quaternion.identity;
+        }
+        */
+        if (destroying) {
+            circleRenderer.transform.localScale -= new Vector3(Time.deltaTime, Time.deltaTime, 0);
+            Color c = circleRenderer.color;
+            c.a -= Time.deltaTime * 2f;
+            if (c.a <= 0) {
+                Destroy(gameObject);
+                return;
+            }
+            circleRenderer.color = c;
+            ominoExample.DecrementAlpha(Time.deltaTime * 2f);
+            orbitalsTransform.localScale += new Vector3(Time.deltaTime * .5f, Time.deltaTime * .5f, 0);
+            foreach (OminoExampleScript orbital in orbitalOminos) {
+                orbital.DecrementAlpha(Time.deltaTime * 2f);
+            }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision) {
+        if (destroying) { return; }
         BlockScript blockScript = collision.GetComponent<BlockScript>();
         OminoScript ominoScript = blockScript.omino;
         colliders[collision] = ominoScript;
     }
     private void OnTriggerExit2D(Collider2D collision) {
+        if (destroying) { return; }
         colliders.Remove(collision);
     }
 }
