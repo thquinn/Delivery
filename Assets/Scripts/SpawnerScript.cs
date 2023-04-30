@@ -38,7 +38,7 @@ public class SpawnerScript : MonoBehaviour
         }
         Vector2 position = Util.GetRandomPointWithinRadius(ARENA_RADIUS);
         int size = Random.Range(4, 9);
-        List<Vector2Int> coors = new List<Vector2Int>(new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(-1, 0), new Vector2Int(-1, -1), new Vector2Int(0, -1) }); //GetRandomOmino(size);
+        List<Vector2Int> coors = GetRandomOmino(size);
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
         float checkRadius = Mathf.Sqrt(Mathf.Pow(dimensions.x / 2f, 2) + Mathf.Pow(dimensions.y / 2f, 2)) * OminoScript.INTERBLOCK_DISTANCE;
         if (ZoneCanSpawnHere(position, checkRadius)) {
