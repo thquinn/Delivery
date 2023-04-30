@@ -16,7 +16,6 @@ public class DeliveryZoneScript : MonoBehaviour
 
     void Start() {
         colliders = new Dictionary<Collider2D, OminoScript>();
-        Init(new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0), new Vector2Int(3, 0), new Vector2Int(4, 0), });
     }
     public void Init(IEnumerable<Vector2Int> coors) {
         float scale = coors.Count() * 6f / 5;

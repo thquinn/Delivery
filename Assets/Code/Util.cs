@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +7,16 @@ using UnityEngine;
 namespace Assets.Code {
     public static class Util {
         static Camera cam;
+
+        public static Vector2 GetRandomPointWithinRadius(float radius) {
+            float rSq = radius * radius;
+            while (true) {
+                Vector2 v = new Vector2(Random.Range(-radius, radius), Random.Range(-radius, radius));
+                if (v.sqrMagnitude <= rSq) {
+                    return v;
+                }
+            }
+        }
 
         public static Quaternion SmoothDampQuaternion(Quaternion current, Quaternion target, ref Vector3 currentVelocity, float smoothTime) {
             Vector3 c = current.eulerAngles;
@@ -41,6 +50,14 @@ namespace Assets.Code {
                 euler.z += 90;
             }
             return q;
+        }
+
+        public static Vector2Int GetCoorsDimensions(IEnumerable<Vector2Int> coors) {
+            int minX = coors.Min(c => c.x);
+            int maxX = coors.Max(c => c.x);
+            int minY = coors.Min(c => c.y);
+            int maxY = coors.Max(c => c.y);
+            return new Vector2Int(maxX - minX + 1, maxY - minY + 1);
         }
 
         static Dictionary<int, int> POLYOMINO_ID_TO_CANONICAL_ID = new Dictionary<int, int>();
@@ -82,7 +99,9 @@ namespace Assets.Code {
         static int GetPolyominoID(List<Vector2Int> coors) {
             hb.Clear();
             foreach (Vector2Int coor in coors.OrderBy(c => c.y).ThenBy(c => c.x)) {
+                hb.Add(987354);
                 hb.Add(coor.x);
+                hb.Add(916785);
                 hb.Add(coor.y);
             }
             return hb.GetHashCode();
@@ -112,6 +131,13 @@ namespace Assets.Code {
             Vector3 worldPos = cam.ScreenToWorldPoint(Input.mousePosition);
             worldPos.z = 0;
             return worldPos;
+        }
+        public static bool IsPointOnCamera(Vector2 position, float radius) {
+            if (cam == null) cam = Camera.main;
+            float diameter = radius * 2;
+            Bounds bounds = new Bounds(position, new Vector3(diameter, diameter, 1));
+            Plane[] planes = GeometryUtility.CalculateFrustumPlanes(cam);
+            return GeometryUtility.TestPlanesAABB(planes, bounds);
         }
     }
 
