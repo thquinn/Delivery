@@ -23,9 +23,18 @@ public class PlayerScript : MonoBehaviour
         rb2d.velocity = Vector3.Lerp(rb2d.velocity, desiredVelocity, .25f);
     }
     Vector2 GetMovementVector() {
+        float jx = Input.GetAxis("Horizontal");
+        float jy = Input.GetAxis("Vertical");
+        Vector2 v = new Vector2(jx, jy);
+        if (v != Vector2.zero) {
+            if (v.sqrMagnitude > 1) {
+                v.Normalize();
+            }
+            return v;
+        }
         float x = Input.GetKey(KeyCode.D) ? 1 : (Input.GetKey(KeyCode.A) ? -1 : 0);
         float y = Input.GetKey(KeyCode.W) ? 1 : (Input.GetKey(KeyCode.S) ? -1 : 0);
-        Vector2 v = new Vector2(x, y);
+        v = new Vector2(x, y);
         if (v.sqrMagnitude > 1) {
             v.Normalize();
         }

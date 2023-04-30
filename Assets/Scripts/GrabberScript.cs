@@ -22,6 +22,8 @@ public class GrabberScript : MonoBehaviour
     BlockScript evisceratingBlock;
     Vector3 scaleVInner, scaleVOuter;
     float vAngle;
+    public bool mouseDisabled;
+    Vector3 lastMousePosition;
 
     void Start() {
         Cursor.visible = false;
@@ -74,6 +76,22 @@ public class GrabberScript : MonoBehaviour
         lastGrabbing = grabbing;
     }
     float GetAngle() {
+        float jx = Input.GetAxis("RHorizontal");
+        float jy = Input.GetAxis("RVertical");
+        Vector2 v = new Vector2(jx, jy);
+        if (v != Vector2.zero) {
+            mouseDisabled = true;
+            v.Normalize();
+            return Mathf.Atan2(v.y, v.x);
+        }
+        if (mouseDisabled) {
+            if (Input.mousePosition != lastMousePosition) {
+                mouseDisabled = false;
+            } else {
+                return lastAngle;
+            }
+            lastMousePosition = Input.mousePosition;
+        }
         Vector3 mouseDelta = Util.GetMouseWorldPosition() - transform.parent.position;
         if (mouseDelta.sqrMagnitude > 5) {
             return Mathf.Atan2(mouseDelta.y, mouseDelta.x);
@@ -81,12 +99,12 @@ public class GrabberScript : MonoBehaviour
         return lastAngle;
     }
     bool IsGrabbing() {
-        return Input.GetMouseButton(0);
+        return Input.GetMouseButton(0) || Input.GetAxis("RTrigger") > .5f;
     }
     bool IsCombineEnabled() {
-        return IsGrabbing() && Input.GetMouseButton(1);
+        return IsGrabbing() && (Input.GetMouseButton(1) || Input.GetAxis("LTrigger") > .5f);
     }
     bool IsEviscerating() {
-        return !IsGrabbing() && Input.GetMouseButton(1);
+        return !IsGrabbing() && (Input.GetMouseButton(1) || Input.GetAxis("LTrigger") > .5f);
     }
 }

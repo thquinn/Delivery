@@ -176,9 +176,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea481cac6830fda4fb128a4f84f5e96a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  grabberScript: {fileID: 508318711}
   canvas: {fileID: 1387318520}
   rt: {fileID: 173059358}
-  canvasGroup: {fileID: 0}
+  canvasGroup: {fileID: 173059362}
   imageBlur: {fileID: 1707221015}
 --- !u!114 &173059360
 MonoBehaviour:
@@ -387,6 +388,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1024
   grabbedOmino: {fileID: 0}
+  mouseDisabled: 0
 --- !u!58 &508318713
 CircleCollider2D:
   m_ObjectHideFlags: 0

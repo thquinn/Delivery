@@ -19,6 +19,7 @@ public class ZoneIndicatorScript : MonoBehaviour
     float vAlpha;
 
     public void Init(DeliveryZoneScript deliveryZoneScript) {
+        canvasGroup.alpha = 0;
         transform.SetAsFirstSibling();
         rtCanvas = transform.parent.GetComponent<RectTransform>();
         cam = Camera.main;
