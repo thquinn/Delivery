@@ -20,12 +20,14 @@ public class OminoScript : MonoBehaviour
     public Dictionary<Vector2Int, BlockScript> coorToScript;
     protected Dictionary<Collider2D, (Vector2Int, Vector2Int)> combineColliderToCoorAndDirection;
 
-    public void Init(IEnumerable<Vector2Int> coors) {
+    public void Init(IEnumerable<Vector3Int> coorsAndColors) {
         colliderToCoor = new Dictionary<Collider2D, Vector2Int>();
         coorToScript = new Dictionary<Vector2Int, BlockScript>();
         combineColliderToCoorAndDirection = new Dictionary<Collider2D, (Vector2Int, Vector2Int)>();
-        foreach (Vector2Int coor in coors) {
-            PutBlockAtCoor(Instantiate(prefabBlock, transform).GetComponent<BlockScript>(), coor);
+        foreach (Vector3Int c in coorsAndColors) {
+            BlockScript blockScript = Instantiate(prefabBlock, transform).GetComponent<BlockScript>();
+            blockScript.SetColor(c.z);
+            PutBlockAtCoor(blockScript, new Vector2Int(c.x, c.y));
         }
         FinalizeOmino();
     }
@@ -48,7 +50,8 @@ public class OminoScript : MonoBehaviour
         }
     }
     void FinalizeOmino() {
-        ID = Util.GetCanonicalPolyominoID(coorToScript.Keys);
+        IEnumerable<Vector3Int> coorsAndColors = coorToScript.Select(kvp => new Vector3Int(kvp.Key.x, kvp.Key.y, kvp.Value.color));
+        ID = Util.GetCanonicalPolyominoID(coorsAndColors);
         rb2d.mass = Size();
         foreach (var kvp in coorToScript) {
             for (int i = 0; i < NEIGHBOR_ORDER.Length; i++) {
@@ -104,11 +107,11 @@ public class OminoScript : MonoBehaviour
             Vector2Int startCoor = coors.First();
             Vector2 startPosition = transform.position + transform.right * startCoor.x * INTERBLOCK_DISTANCE + transform.up * startCoor.y * INTERBLOCK_DISTANCE;
             HashSet<Vector2Int> connected = GetConnected(startCoor);
-            var rootedCoors = connected.Select(c => c - startCoor);
+            var rootedCoorsAndColors = connected.Select(c => new Vector3Int(c.x - startCoor.x, c.y - startCoor.y, coorToScript[c].color));
             OminoScript newOmino = SpawnerScript.instance.SpawnEmpty();
             newOmino.transform.position = startPosition;
             newOmino.transform.rotation = transform.rotation;
-            newOmino.Init(rootedCoors);
+            newOmino.Init(rootedCoorsAndColors);
             foreach (Vector2Int c in connected) {
                 DestroyBlock(c);
             }
@@ -125,7 +128,7 @@ public class OminoScript : MonoBehaviour
             combineColliderToCoorAndDirection.Remove(c);
         }
         if (particle) {
-            ParticleHelper.instance.Eviscerate(blockScript.transform.position);
+            ParticleHelper.instance.Eviscerate(blockScript.transform.position, blockScript.color);
             SFXHelper.instance.Eviscerate();
         }
         Destroy(blockScript.gameObject);

@@ -1,6 +1,7 @@
 using Assets.Code;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ZoneIndicatorScript : MonoBehaviour
@@ -23,9 +24,10 @@ public class ZoneIndicatorScript : MonoBehaviour
         rtCanvas = transform.parent.GetComponent<RectTransform>();
         cam = Camera.main;
         deliveryZone = deliveryZoneScript.gameObject;
-        Vector2Int dimensions = Util.GetCoorsDimensions(deliveryZoneScript.coors);
+        IEnumerable<Vector2Int> coors = deliveryZoneScript.coorsAndColors.Select(c => new Vector2Int(c.x, c.y));
+        Vector2Int dimensions = Util.GetCoorsDimensions(coors);
         radius = Mathf.Sqrt(dimensions.x * dimensions.x + dimensions.y * dimensions.y) * 3f;
-        Instantiate(prefabOminoExample, rt).GetComponent<OminoExampleScript>().Init(deliveryZoneScript.coors, true);
+        Instantiate(prefabOminoExample, rt).GetComponent<OminoExampleScript>().Init(deliveryZoneScript.coorsAndColors, true);
     }
     
     void Update() {

@@ -30,7 +30,7 @@ public class ClockScript : MonoBehaviour
         float angle = Mathf.PI / 2 - 2 * Mathf.PI * lastPercent;
         rtText.anchoredPosition = new Vector2(textDistance * Mathf.Cos(angle), textDistance * Mathf.Sin(angle));
         tmp.text = Mathf.CeilToInt(time.x) + "s";
-        float colorT = Mathf.Clamp01(Mathf.InverseLerp(12, 8, time.x));
+        float colorT = Mathf.Clamp01(Mathf.InverseLerp(12, 3, time.x));
         circle.color = Color.Lerp(colorWhite, colorRed, colorT);
     }
 }

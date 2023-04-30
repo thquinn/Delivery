@@ -10,6 +10,13 @@ public class ConnectVFXScript : MonoBehaviour
 
     public SpriteRenderer[] spriteRenderers;
 
+    public void SetColor(int blockColor) {
+        Color c = Util.HueshiftBlockColor(spriteRenderers[0].color, blockColor);
+        foreach (SpriteRenderer sr in spriteRenderers) {
+            sr.color = c;
+        }
+    }
+
     void Update() {
         transform.localScale = Util.Damp(transform.localScale, TARGET_SCALE, .001f, Time.deltaTime);
         float a = spriteRenderers[0].color.a;

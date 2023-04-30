@@ -9,20 +9,40 @@ public class BlockScript : MonoBehaviour
     static float EVISCERATION_TIME = 1;
 
     public GameObject prefabConnectVFX;
+    public Material materialOutline1;
 
     public Transform spritesTransform;
     public Collider2D c2d;
     public Collider2D[] combineColliders;
+    public SpriteRenderer outlineRenderer;
     public SpriteRenderer[] combineGlows;
     public SpriteRenderer eviscerationOverlay;
+    public SpriteRenderer[] hueshiftedSprites;
 
     public OminoScript omino;
 
+    public int color;
     public bool combineLerping;
     Vector3 lerpV, lerpAV;
     public bool beingEviscerated;
     float eviscerationTime;
     List<Vector2Int> connectVFX;
+
+    public void SetColor(int color) {
+        this.color = color;
+        foreach (SpriteRenderer sr in hueshiftedSprites) {
+            sr.color = Util.HueshiftBlockColor(sr.color, color);
+        }
+        switch (color) {
+            case 0:
+                break;
+            case 1:
+                outlineRenderer.material = materialOutline1;
+                break;
+            default:
+                throw new System.Exception("Unexpected color assigning outline material.");
+        }
+    }
 
     void Update() {
         // Combine lerping.
@@ -45,6 +65,7 @@ public class BlockScript : MonoBehaviour
                         if (direction == Vector2Int.left || direction == Vector2Int.right) {
                             connectVFX.transform.Rotate(0, 0, 90);
                         }
+                        connectVFX.GetComponent<ConnectVFXScript>().SetColor(color);
                     }
                     connectVFX.Clear();
                     SFXHelper.instance.Snap();

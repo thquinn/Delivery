@@ -960,6 +960,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabConnectVFX: {fileID: 5000173192363209519, guid: 5f10f16dc9aed8d43936cabf31d6a3d6, type: 3}
+  materialOutline1: {fileID: 2100000, guid: 67de5c753f274414e99342cf72cfda48, type: 2}
   spritesTransform: {fileID: 3295372906032920758}
   c2d: {fileID: 6604296448550994254}
   combineColliders:
@@ -967,13 +968,22 @@ MonoBehaviour:
   - {fileID: 5857893052905927549}
   - {fileID: 637230592326503246}
   - {fileID: 2447778794888332048}
+  outlineRenderer: {fileID: 6604296448212323836}
   combineGlows:
   - {fileID: 807888927180653997}
   - {fileID: 7996433625352001971}
   - {fileID: 8606387998610998747}
   - {fileID: 2137547424415226573}
   eviscerationOverlay: {fileID: 8462235272542545267}
+  hueshiftedSprites:
+  - {fileID: 6849674341315200934}
+  - {fileID: 807888927180653997}
+  - {fileID: 7996433625352001971}
+  - {fileID: 8606387998610998747}
+  - {fileID: 2137547424415226573}
+  - {fileID: 8462235272542545267}
   omino: {fileID: 0}
+  color: 0
   combineLerping: 0
   beingEviscerated: 0
 --- !u!61 &6604296448550994254

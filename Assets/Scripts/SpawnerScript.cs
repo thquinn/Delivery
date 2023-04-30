@@ -8,8 +8,8 @@ public class SpawnerScript : MonoBehaviour
 {
     static float PIECE_SPAWN_DISTANCE_MULT = 3;
     static float ZONE_SPAWN_DISTANCE_MULT = 5;
-    static Vector2Int[] STARTING_TARGET = new Vector2Int[] { new Vector2Int(0, 0), new Vector2Int(1, 0) };
-    static Vector2Int[] MONOMINO = new Vector2Int[] { new Vector2Int(0, 0) };
+    static Vector3Int[] STARTING_TARGET = new Vector3Int[] { new Vector3Int(0, 0, 0), new Vector3Int(1, 0, 0) };
+    static Vector3Int[] MONOMINO = new Vector3Int[] { new Vector3Int(0, 0, 0) };
 
     public static SpawnerScript instance;
 
@@ -56,7 +56,7 @@ public class SpawnerScript : MonoBehaviour
         if ((position - playerPosition).magnitude < GameHelper.instance.arenaRadius * .33f) {
             return;
         }
-        float maxSize = 5 + GameHelper.instance.timePassed / 30;
+        float maxSize = 4.5f + GameHelper.instance.timePassed / 30;
         int size = Mathf.RoundToInt(Random.Range(4, maxSize));
         List<Vector2Int> coors = GetRandomOmino(size);
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
@@ -70,7 +70,7 @@ public class SpawnerScript : MonoBehaviour
             // Spawn zone.
             GameObject zone = Instantiate(prefabZone);
             zone.transform.position = position;
-            zone.GetComponent<DeliveryZoneScript>().Init(coors);
+            zone.GetComponent<DeliveryZoneScript>().Init(AddOminoColors(coors));
             deliveryZones.Add(zone);
         }
     }
@@ -91,7 +91,7 @@ public class SpawnerScript : MonoBehaviour
             GameObject omino = Instantiate(prefabOmino);
             omino.transform.position = position;
             omino.transform.rotation = Quaternion.Euler(0, 0, Random.Range(0, 360f));
-            omino.GetComponent<OminoScript>().Init(coors);
+            omino.GetComponent<OminoScript>().Init(AddOminoColors(coors));
         }
     }
     bool ZoneCanSpawnHere(Vector2 position, float checkRadius) {
@@ -134,6 +134,10 @@ public class SpawnerScript : MonoBehaviour
                 }
             }
         }
-        return new List<Vector2Int>(omino);
+        return omino.ToList();
+    }
+    List<Vector3Int> AddOminoColors(IEnumerable<Vector2Int> coors) {
+        float goldChance = .5f;// Mathf.Pow(Mathf.Max(0, GameHelper.instance.timePassed) / 250, .5f) * .2f;
+        return coors.Select(c => new Vector3Int(c.x, c.y, Random.value < goldChance ? 1 : 0)).ToList();
     }
 }

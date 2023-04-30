@@ -41,6 +41,43 @@ namespace Assets.Code {
             );
         }
 
+        static Dictionary<(Color, int), Color> MEMO_HUESHIFT = new Dictionary<(Color, int), Color>();
+        public static Color HueshiftBlockColor(Color c, int blockColor) {
+            if (blockColor == 0) {
+                return c;
+            }
+            if (MEMO_HUESHIFT.ContainsKey((c, blockColor))) {
+                return MEMO_HUESHIFT[(c, blockColor)];
+            }
+            float h, s, v;
+            Color.RGBToHSV(c, out h, out s, out v);
+            switch (blockColor) {
+                case 1:
+                    h = .136111f;
+                    break;
+                default:
+                    throw new System.Exception("Unexpected block color to hueshift.");
+            }
+            Color shifted = Color.HSVToRGB(h, s, v);
+            shifted.a = c.a;
+            MEMO_HUESHIFT[(c, blockColor)] = shifted;
+            return shifted;
+        }
+        static Dictionary<Color, Color> ORBITAL_COLOR_MEMO = new Dictionary<Color, Color>();
+        public static Color OrbitalColor(Color c) {
+            if (ORBITAL_COLOR_MEMO.ContainsKey(c)) {
+                return ORBITAL_COLOR_MEMO[c];
+            }
+            float h, s, v;
+            Color.RGBToHSV(c, out h, out s, out v);
+            s = 1;
+            v = 1;
+            Color output = Color.HSVToRGB(h, s, v);
+            output.a = .25f;
+            ORBITAL_COLOR_MEMO[c] = output;
+            return output;
+        }
+
         public static int GetRotationsBetweenDirections(Vector2Int d1, Vector2Int d2) {
             if (d1 == d2) return 0;
             if (d1.x == d2.x || d1.y == d2.y) return 2;
@@ -75,10 +112,10 @@ namespace Assets.Code {
 
         static Dictionary<int, int> POLYOMINO_ID_TO_CANONICAL_ID = new Dictionary<int, int>();
         static HashBuilder hb = new HashBuilder();
-        public static int GetCanonicalPolyominoID(IEnumerable<Vector2Int> origCoors) {
+        public static int GetCanonicalPolyominoID(IEnumerable<Vector3Int> origCoors) {
             int minX = origCoors.Min(c => c.x);
             int minY = origCoors.Min(c => c.y);
-            List<Vector2Int> coors = new List<Vector2Int>(origCoors.Select(c => new Vector2Int(c.x - minX, c.y - minY)));
+            List<Vector3Int> coors = new List<Vector3Int>(origCoors.Select(c => new Vector3Int(c.x - minX, c.y - minY, c.z)));
             int firstID = GetPolyominoID(coors);
             if (POLYOMINO_ID_TO_CANONICAL_ID.ContainsKey(firstID)) {
                 return POLYOMINO_ID_TO_CANONICAL_ID[firstID];
@@ -109,21 +146,23 @@ namespace Assets.Code {
             }
             return canonical;
         }
-        static int GetPolyominoID(List<Vector2Int> coors) {
+        static int GetPolyominoID(List<Vector3Int> coors) {
             hb.Clear();
-            foreach (Vector2Int coor in coors.OrderBy(c => c.y).ThenBy(c => c.x)) {
+            foreach (Vector3Int coor in coors.OrderBy(c => c.y).ThenBy(c => c.x)) {
                 hb.Add(987354);
                 hb.Add(coor.x);
                 hb.Add(916785);
                 hb.Add(coor.y);
+                hb.Add(2347869);
+                hb.Add(coor.z);
             }
             return hb.GetHashCode();
         }
-        static List<Vector2Int> RotatePolyomino(List<Vector2Int> coors, int maxY) {
-            return coors.Select(c => new Vector2Int(maxY - c.y, c.x)).ToList();
+        static List<Vector3Int> RotatePolyomino(List<Vector3Int> coors, int maxY) {
+            return coors.Select(c => new Vector3Int(maxY - c.y, c.x, c.z)).ToList();
         }
-        static List<Vector2Int> FlipPolyomino(List<Vector2Int> coors, int maxX) {
-            return coors.Select(c => new Vector2Int(maxX - c.x, c.y)).ToList();
+        static List<Vector3Int> FlipPolyomino(List<Vector3Int> coors, int maxX) {
+            return coors.Select(c => new Vector3Int(maxX - c.x, c.y, c.z)).ToList();
         }
 
         public static Rigidbody2D GetClosest(Vector2 position, float radius, LayerMask layerMask) {
