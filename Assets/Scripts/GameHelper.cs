@@ -41,7 +41,7 @@ public class GameHelper : MonoBehaviour
         paused = false;
         int size = omino.Size();
         float seconds = size * 5;
-        float timeMultiplier = 100 / (100 + timePassed * .1f);
+        float timeMultiplier = 66 / (66 + timePassed * .1f);
         float missingTime = 1 - timer.x / timer.y;
         timeMultiplier = Mathf.Lerp(timeMultiplier, 1, missingTime);
         seconds *= timeMultiplier;

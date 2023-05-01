@@ -7706,7 +7706,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wind: {fileID: 2054771478}
-  targetVolume: 0.5
+  targetVolume: 0.4
   fadeSpeed: 0.1
 --- !u!1 &2070261215
 GameObject:

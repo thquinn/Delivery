@@ -81,7 +81,7 @@ public class SpawnerScript : MonoBehaviour
         if ((position - playerPosition).magnitude < GameHelper.instance.arenaRadius * .33f) {
             return;
         }
-        float maxSize = 4.5f + Mathf.Pow(GameHelper.instance.timePassed / 30, .6f);
+        float maxSize = 4.5f + Mathf.Pow(GameHelper.instance.timePassed / 40, .6f);
         int size = Mathf.RoundToInt(Random.Range(4, maxSize));
         List<Vector2Int> coors = GetRandomOmino(size);
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
@@ -105,7 +105,7 @@ public class SpawnerScript : MonoBehaviour
         }
         Vector2 position = Util.GetRandomPointWithinRadius(GameHelper.instance.arenaRadius);
         int size = -1;
-        float max = 8;
+        float max = 9;
         while (size <= 0) {
             size = Mathf.RoundToInt(Random.Range(-max, max) + Random.Range(-max, max));
         }
