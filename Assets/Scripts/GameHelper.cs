@@ -14,6 +14,7 @@ public class GameHelper : MonoBehaviour
     public Vector2 timer;
     public float arenaRadius;
     public int score;
+    public bool gameOver;
 
     void Start() {
         instance = this;
@@ -22,12 +23,15 @@ public class GameHelper : MonoBehaviour
     }
 
     void Update() {
-        if (paused && PlayerScript.instance.transform.position.magnitude > 40) {
+        if (paused && PlayerScript.instance.transform.position.magnitude > 30) {
             paused = false;
         }
-        if (!paused) {
+        if (!paused && !gameOver) {
             timePassed += Time.deltaTime;
             timer.x = Mathf.Max(0, timer.x - Time.deltaTime);
+            if (timer.x <= 0) {
+                gameOver = true;
+            }
         }
         arenaRadius = RADIUS_INITIAL + RADIUS_GROWTH_RATE * Mathf.Sqrt(timePassed);
         Shader.SetGlobalFloat("_ArenaRadius", arenaRadius);
@@ -37,6 +41,10 @@ public class GameHelper : MonoBehaviour
         paused = false;
         int size = omino.Size();
         float seconds = size * 5;
+        float timeMultiplier = 100 / (100 + timePassed * .1f);
+        float missingTime = 1 - timer.x / timer.y;
+        timeMultiplier = Mathf.Lerp(timeMultiplier, 1, missingTime);
+        seconds *= timeMultiplier;
         timer.x = Mathf.Min(timer.y, timer.x + seconds);
         score += size * 100 * omino.GetMultiplier();
     }

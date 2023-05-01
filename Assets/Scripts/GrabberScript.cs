@@ -6,8 +6,10 @@ using UnityEngine;
 
 public class GrabberScript : MonoBehaviour
 {
+    public static GrabberScript instance;
+
     static float DISTANCE = 10;
-    static float STRENGTH = 2000;
+    static float STRENGTH = 1333;
     static Vector3 SCALE_INNER = new Vector3(.85f, .85f, 1);
     static Vector3 SCALE_OUTER = new Vector3(1.2f, 1.2f, 1);
 
@@ -24,12 +26,20 @@ public class GrabberScript : MonoBehaviour
     float vAngle;
     public bool mouseDisabled;
     Vector3 lastMousePosition;
+    public float glowTimer;
 
     void Start() {
+        instance = this;
         Cursor.visible = false;
+    }
+    void Update() {
+        glowTimer += Time.deltaTime;
     }
 
     void FixedUpdate() {
+        if (GameHelper.instance.gameOver) {
+            return;
+        }
         float angle = GetAngle();
         if (grabbedOmino != null) {
             angle = Mathf.SmoothDampAngle(lastAngle * Mathf.Rad2Deg, angle * Mathf.Rad2Deg, ref vAngle, .1f, STRENGTH / grabbedOmino.Size(), Time.fixedDeltaTime);
@@ -54,7 +64,11 @@ public class GrabberScript : MonoBehaviour
             }
         }
         if (grabbedOmino != null) {
-            grabbedOmino.combineEnabled = IsCombineEnabled();
+            bool combineEnabled = IsCombineEnabled();
+            if (combineEnabled && grabbedOmino?.combineEnabled == false) {
+                glowTimer = 0;
+            }
+            grabbedOmino.combineEnabled = combineEnabled;
         }
         grabInnerRenderer.transform.localScale = Vector3.SmoothDamp(grabInnerRenderer.transform.localScale, grabbing ? Vector3.one : SCALE_INNER, ref scaleVInner, .05f);
         grabOuterRenderer.transform.localScale = Vector3.SmoothDamp(grabOuterRenderer.transform.localScale, grabbing ? Vector3.one : SCALE_OUTER, ref scaleVOuter, .05f);

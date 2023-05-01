@@ -59,6 +59,9 @@ public class SpawnerScript : MonoBehaviour
             }
         }
         foreach (OminoScript omino in ominos) {
+            if (omino.Size() > 1 && omino.product) {
+                continue; // don't destroy ominos that the player has done something to
+            }
             if (Random.value < .02 && !Util.IsPointOnCamera(omino.transform.position, omino.Size() * OminoScript.INTERBLOCK_DISTANCE)) {
                 Destroy(omino.gameObject);
             }

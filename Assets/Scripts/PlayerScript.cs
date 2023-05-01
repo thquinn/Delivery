@@ -38,6 +38,9 @@ public class PlayerScript : MonoBehaviour
         rb2d.velocity = Vector3.Lerp(rb2d.velocity, desiredVelocity, .25f);
     }
     Vector2 GetMovementVector() {
+        if (GameHelper.instance.gameOver) {
+            return Vector2.zero;
+        }
         float jx = Input.GetAxis("Horizontal");
         float jy = Input.GetAxis("Vertical");
         Vector2 v = new Vector2(jx, jy);

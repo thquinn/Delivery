@@ -20,7 +20,6 @@ public class BlockScript : MonoBehaviour
     public SpriteRenderer[] hueshiftedSprites;
 
     public OminoScript omino;
-
     public int color;
     public bool combineLerping;
     Vector3 lerpV, lerpAV;
@@ -90,7 +89,7 @@ public class BlockScript : MonoBehaviour
             } else {
                 combineGlows[i].gameObject.SetActive(true);
                 Color c = combineGlows[i].color;
-                c.a = Mathf.Sin(Time.time * 4) * .5f + .5f;
+                c.a = Mathf.Sin(GrabberScript.instance.glowTimer * 4 - Mathf.PI / 4) * .5f + .5f;
                 combineGlows[i].color = c;
             }
         }

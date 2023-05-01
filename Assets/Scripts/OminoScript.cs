@@ -15,6 +15,7 @@ public class OminoScript : MonoBehaviour
 
     public int ID;
     public bool combineEnabled;
+    public bool product; // true if this omino was the result of a player operation (combining or evisc)
 
     protected Dictionary<Collider2D, Vector2Int> colliderToCoor;
     public Dictionary<Vector2Int, BlockScript> coorToScript;
@@ -90,6 +91,8 @@ public class OminoScript : MonoBehaviour
             }
         }
         Destroy(otherOmino.gameObject);
+        product = true;
+        GrabberScript.instance.glowTimer = 0;
         FinalizeOmino();
     }
 
@@ -112,11 +115,13 @@ public class OminoScript : MonoBehaviour
             newOmino.transform.position = startPosition;
             newOmino.transform.rotation = transform.rotation;
             newOmino.Init(rootedCoorsAndColors);
+            newOmino.product = true;
             foreach (Vector2Int c in connected) {
                 DestroyBlock(c);
             }
             coors.ExceptWith(connected);
         }
+        product = true;
         FinalizeOmino();
     }
     void DestroyBlock(Vector2Int coor, bool particle = false) {
