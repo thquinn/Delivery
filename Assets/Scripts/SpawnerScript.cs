@@ -81,7 +81,7 @@ public class SpawnerScript : MonoBehaviour
         if ((position - playerPosition).magnitude < GameHelper.instance.arenaRadius * .33f) {
             return;
         }
-        float maxSize = 4.5f + Mathf.Pow(GameHelper.instance.timePassed / 40, .6f);
+        float maxSize = 4.25f + Mathf.Pow(GameHelper.instance.timePassed / 40, .55f);
         int size = Mathf.RoundToInt(Random.Range(4, maxSize));
         List<Vector2Int> coors = GetRandomOmino(size);
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
@@ -104,11 +104,14 @@ public class SpawnerScript : MonoBehaviour
             return;
         }
         Vector2 position = Util.GetRandomPointWithinRadius(GameHelper.instance.arenaRadius);
+        int maxSize = Mathf.RoundToInt(3 + GameHelper.instance.timePassed * .01f);
+        /*
         int size = -1;
-        float max = 9;
         while (size <= 0) {
-            size = Mathf.RoundToInt(Random.Range(-max, max) + Random.Range(-max, max));
+            size = Mathf.RoundToInt(Random.Range(-maxSize, maxSize) + Random.Range(-maxSize, maxSize));
         }
+        */
+        int size = Random.Range(1, maxSize + 1);
         List<Vector2Int> coors = GetRandomOmino(size);
         Vector2Int dimensions = Util.GetCoorsDimensions(coors);
         float hypot = Mathf.Sqrt(dimensions.x * dimensions.x + dimensions.y * dimensions.y);
@@ -129,7 +132,7 @@ public class SpawnerScript : MonoBehaviour
         return c2d == null;
     }
     bool PieceCanSpawnHere(Vector2 position, float hypot) {
-        float checkRadius = hypot * OminoScript.INTERBLOCK_DISTANCE;
+        float checkRadius = hypot * OminoScript.INTERBLOCK_DISTANCE * .5f + 4;
         if (Util.IsPointOnCamera(position, checkRadius)) {
             return false;
         }
@@ -164,7 +167,7 @@ public class SpawnerScript : MonoBehaviour
         return omino.ToList();
     }
     List<Vector3Int> AddOminoColors(IEnumerable<Vector2Int> coors) {
-        float goldChance = Mathf.Pow(Mathf.Max(0, GameHelper.instance.timePassed - 120) / 250, .5f) * .2f;
+        float goldChance = Mathf.Pow(Mathf.Max(0, GameHelper.instance.timePassed - 120) / 500, .4f) * .2f;
         int numGolds = 0;
         foreach (var c in coors) {
             numGolds += Random.value < goldChance ? 1 : 0;

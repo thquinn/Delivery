@@ -16,7 +16,7 @@ public class GameOverScript : MonoBehaviour
     }
 
     void Update() {
-        if (GameHelper.instance.gameOver && Input.GetKeyDown(KeyCode.R)) {
+        if (GameHelper.instance.gameOver && (Input.GetKeyDown(KeyCode.R) || Input.GetButtonDown("Start"))) {
             Instantiate(prefabFadeOutScript, transform.parent);
             Destroy(this);
         }

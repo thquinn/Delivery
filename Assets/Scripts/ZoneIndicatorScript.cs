@@ -38,15 +38,16 @@ public class ZoneIndicatorScript : MonoBehaviour
         }
         Vector2 zonePos = deliveryZone.transform.position;
         Vector2 camPos = cam.transform.position;
-        bool show = !GameHelper.instance.paused && !Util.IsPointOnCamera(zonePos, radius);
+        float scale = 1 / Mathf.Max(1, (zonePos - camPos).magnitude / 100 + .01f);
+        bool show = !GameHelper.instance.paused && !Util.IsPointOnCamera(zonePos, radius) && scale > .4f;
         canvasGroup.alpha = Mathf.SmoothDamp(canvasGroup.alpha, show ? 1 : 0, ref vAlpha, .1f);
-
         Vector2 normalizedDelta = (zonePos - camPos).normalized;
         Vector2 cornerVector = (rtCanvas.sizeDelta / 2) - MARGIN;
         float xScale = Mathf.Abs(cornerVector.x / normalizedDelta.x);
         float yScale = Mathf.Abs(cornerVector.y / normalizedDelta.y);
-        float scaleFactor = Mathf.Min(xScale, yScale);
-        rt.anchoredPosition = normalizedDelta * scaleFactor;
+        float canvasScaleFactor = Mathf.Min(xScale, yScale);
+        rt.anchoredPosition = normalizedDelta * canvasScaleFactor;
         rt.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(normalizedDelta.y, normalizedDelta.x) * Mathf.Rad2Deg);
+        rt.localScale = new Vector3(scale, scale, 1);
     }
 }

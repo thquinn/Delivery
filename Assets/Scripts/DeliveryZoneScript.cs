@@ -67,7 +67,6 @@ public class DeliveryZoneScript : MonoBehaviour
             foreach (OminoScript omino in ominos) {
                 if (omino.ID == targetID && omino.ContainsAll(colliders)) {
                     GameHelper.instance.Deliver(omino);
-                    PlayerScript.instance.boostSeconds += 2 + omino.Size() / 4f * 5;
                     Destroy(omino.gameObject);
                     Instantiate(prefabOminoDisappearVFX).GetComponent<OminoDisappearVFXScript>().Init(omino);
                     GameObject scorePopup = Instantiate(prefabScorePopup);

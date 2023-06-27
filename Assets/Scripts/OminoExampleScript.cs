@@ -34,7 +34,7 @@ public class OminoExampleScript : MonoBehaviour
         if (canvas) {
             Vector2Int dimensions = Util.GetCoorsDimensions(coors);
             float hypot = Mathf.Sqrt(dimensions.x * dimensions.x + dimensions.y * dimensions.y);
-            float scale = 10 / hypot;
+            float scale = 15 / hypot;
             transform.localScale = new Vector3(scale, scale, 1);
         }
     }

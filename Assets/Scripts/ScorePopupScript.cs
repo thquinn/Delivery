@@ -15,10 +15,13 @@ public class ScorePopupScript : MonoBehaviour
     Vector3 velocity;
 
     public void Init(OminoScript omino) {
+        Vector3 localPosition = transform.localPosition;
+        localPosition.z = -5;
+        transform.localPosition = localPosition;
         string text = "+" + (omino.Size() * 100).ToString("N0");
         int multiplier = omino.GetMultiplier();
         if (multiplier > 1) {
-            text += "<voffset=.17em><size=66%> x </size></voffset>" + multiplier;
+            text += "<color=#ffd000><voffset=.17em><size=66%> x </size></voffset>" + multiplier;
         }
         tmp.text = text;
         Color c = tmp.color;

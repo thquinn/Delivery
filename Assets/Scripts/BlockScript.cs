@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class BlockScript : MonoBehaviour
 {
@@ -68,6 +69,7 @@ public class BlockScript : MonoBehaviour
                     }
                     connectVFX.Clear();
                     SFXHelper.instance.Snap();
+                    Invoke("SnapRumble", .1f);
                 }
             }
         }
@@ -106,5 +108,13 @@ public class BlockScript : MonoBehaviour
             connectVFX = new List<Vector2Int>();
         }
         connectVFX.Add(direction);
+    }
+
+    void SnapRumble() {
+        Gamepad.current?.SetMotorSpeeds(1, 1);
+        Invoke("StopRumble", .066f);
+    }
+    void StopRumble() {
+        Gamepad.current?.SetMotorSpeeds(0, 0);
     }
 }

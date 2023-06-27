@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerScript : MonoBehaviour
 {
     public static PlayerScript instance;
-    static float SPEED = 20;
+    static float SPEED = 30;
+    static float BOOST_MULT = 1.33f;
 
     public Rigidbody2D rb2d;
     public GrabberScript grabberScript;
@@ -27,7 +28,7 @@ public class PlayerScript : MonoBehaviour
     }
     void UpdateInput() {
         float speed = SPEED;
-        float boostMultiplier = Mathf.Lerp(1, 1.5f, Mathf.Clamp01(Mathf.InverseLerp(0, 2, boostSeconds)));
+        float boostMultiplier = Mathf.Lerp(1, BOOST_MULT, Mathf.Clamp01(Mathf.InverseLerp(0, 2, boostSeconds)));
         speed *= boostMultiplier;
         if (grabberScript.grabbedOmino != null) {
             float size = grabberScript.grabbedOmino.Size();
@@ -35,6 +36,9 @@ public class PlayerScript : MonoBehaviour
             speed *= Mathf.Lerp(multiplier, 1, .75f);
         }
         Vector3 desiredVelocity = GetMovementVector() * speed;
+        if (GrabberScript.instance.grabbedOmino?.combineEnabled == true) {
+            desiredVelocity *= .66f;
+        }
         rb2d.velocity = Vector3.Lerp(rb2d.velocity, desiredVelocity, .25f);
     }
     Vector2 GetMovementVector() {

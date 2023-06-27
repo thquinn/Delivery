@@ -821,7 +821,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 30
+  orthographic size: 35
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -7390,7 +7390,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: press R to restart
+  m_text: press R or START to restart
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 86a9875a210857b4483886b292270398, type: 2}
   m_sharedMaterial: {fileID: 7736203359332322430, guid: 86a9875a210857b4483886b292270398, type: 2}
